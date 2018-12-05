@@ -1,0 +1,43 @@
+version: '3.5'
+
+services:
+  react:
+    container_name: react-client
+    build:
+      context: ./react-client
+      dockerfile: Dockerfile
+    volumes:
+      - './react-client:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - '4000:3000'
+    environment:
+      - NODE_ENV=development
+
+  express:
+    build:
+      context: ./express-server
+      dockerfile: Dockerfile
+    ports:
+      - "4100:4100"
+
+  # start MySQL server instance
+  mysql:
+    image: "mysql:5.6"
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: testpass
+
+  # start phpMyAdmin and link it to MySQL server instance
+  phpmyadmin:
+    image: "phpmyadmin/phpmyadmin:4.7.9-1"
+    restart: always
+    links:
+      - mysql:db
+    ports:
+      - "4040:80"
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: testpass
